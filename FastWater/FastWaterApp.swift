@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct FastWaterApp: App {
+    @StateObject var coordinator = AppCoordinator()
+
     var body: some Scene {
         WindowGroup {
-            WelcomeView()
+            coordinator.buildRootView()
+                .environmentObject(coordinator)
         }
     }
 }

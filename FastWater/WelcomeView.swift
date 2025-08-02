@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct WelcomeView: View {
+
+    @EnvironmentObject var coordinator: AppCoordinator
+
     var body: some View {
         ZStack {
             Image("WelcomeBackground")
@@ -59,7 +62,7 @@ struct WelcomeView: View {
             VStack {
                 Spacer()
                 Button {
-                    print("I was clicked")
+                    coordinator.navigate(to: .dashboard)
                 } label: {
                     Text("GET STARTED")
                         .font(

@@ -20,7 +20,7 @@ struct CalendarView: View {
             VStack {
                 HStack{
                     Spacer()
-                    SettingsView()
+                    SettingsButtonView()
                 }
                 Spacer()
             }
@@ -38,7 +38,6 @@ struct CalendarView: View {
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity, alignment: .center)
                 HStack(spacing: 26) {
-//                    Spacer()
                     Button(action: {
                         changeMonth(by: -1)
                     }) {
@@ -52,7 +51,6 @@ struct CalendarView: View {
                             Font.custom("Lato-Black", size: 25)
                         )
                         .foregroundStyle(Color(hex: "F0C17E"))
-//                        .frame(maxWidth: .infinity, alignment: .center)
                     Button(action: {
                         changeMonth(by: 1)
                     }) {
@@ -61,7 +59,6 @@ struct CalendarView: View {
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 20, height: 20)
                     }
-//                    Spacer()
                 }
                 .padding(.top, 8)
                 HStack {

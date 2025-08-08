@@ -1,5 +1,5 @@
 //
-//  SettingsView.swift
+//  SettingsButtonView.swift
 //  FastWater
 //
 //  Created by Ammar on 03/08/2025.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SettingsView: View {
+struct SettingsButtonView: View {
     @State private var showingSettings = false
 
     var body: some View {
@@ -17,7 +17,7 @@ struct SettingsView: View {
             HStack {
                 Spacer()
                 Button(action: {
-                    print("SettingsView")
+                    print("SettingsButtonView")
                     showingSettings = true
                 }) {
                     Image("SettingsNavBar")

@@ -33,7 +33,7 @@ struct WaterView: View {
             Color(hex: "081325")
                 .ignoresSafeArea()
             VStack {
-                SettingsButtonView()
+                SettingsButtonView(showSettings: .constant(false))
                 Spacer()
             }
             VStack {

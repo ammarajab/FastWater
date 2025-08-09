@@ -20,7 +20,7 @@ struct CalendarView: View {
             VStack {
                 HStack{
                     Spacer()
-                    SettingsButtonView()
+                    SettingsButtonView(showSettings: .constant(false))
                 }
                 Spacer()
             }

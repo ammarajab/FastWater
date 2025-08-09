@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SettingsButtonView: View {
-    @State private var showingSettings = false
+    @Binding var showSettings: Bool
 
     var body: some View {
         ZStack {
@@ -18,7 +18,7 @@ struct SettingsButtonView: View {
                 Spacer()
                 Button(action: {
                     print("SettingsButtonView")
-                    showingSettings = true
+                    showSettings = true
                 }) {
                     Image("SettingsNavBar")
                         .resizable()

@@ -12,6 +12,7 @@ struct HomeView: View {
     @State private var isFasting: Bool = false
     @State private var timer: Timer?
     @State private var showPopup = false
+    @Binding var showSettings: Bool
 
     let targetProgress: Double = 1.0  // How full the bar should get
     let speed: Double = 1 / 60        // How much to increment each tick
@@ -24,7 +25,7 @@ struct HomeView: View {
             VStack {
                 HStack{
                     Spacer()
-                    SettingsButtonView()
+                    SettingsButtonView(showSettings: $showSettings)
                 }
                 Spacer()
             }
@@ -168,7 +169,7 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView()
+    HomeView(showSettings: .constant(false))
 }
 
 struct RoundedCorner: Shape {

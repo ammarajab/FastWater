@@ -11,9 +11,7 @@ import Combine
 enum AppRoute: Hashable {
     case welcome
     case dashboard
-    case home
-    case calendar
-    case water
+    case settings
 }
 
 class AppCoordinator: ObservableObject {
@@ -21,7 +19,8 @@ class AppCoordinator: ObservableObject {
     @Published var root: AppRoute
 
     init() {
-        let isFirstLaunch = UserDefaults.standard.bool(forKey: "isFirstLaunch")
+        UIScrollView.appearance().indicatorStyle = .white
+        let isFirstLaunch = true //UserDefaults.standard.bool(forKey: "isFirstLaunch")
         self.path = NavigationPath()
         self.root = isFirstLaunch ? .welcome : .dashboard
     }
@@ -31,10 +30,11 @@ class AppCoordinator: ObservableObject {
         case .dashboard:
             path = NavigationPath()
             root = .dashboard
+        case .settings:
+            path.append(route)
         default:
             return
         }
-        path.append(route)
     }
 
     func goBack() {

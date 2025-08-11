@@ -15,21 +15,11 @@ struct WelcomeView: View {
         ZStack {
             Image("WelcomeBackground")
                 .resizable()
-                .scaledToFill()
                 .ignoresSafeArea()
             VStack {
-                Spacer()
-                HStack {
-                    Spacer()
-                    Image("WelcomeFooter")
-                        .padding(.bottom, 15)
-                }
-            }
-            VStack {
-                HStack {
-                    Image("WelcomeHeader")
-                    Spacer()
-                }
+                Image("WelcomeHeader")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 45)
                 Text("Fast Smart, Hydrate Strong")
                     .font(
                         Font.custom("Lato-Black", size: 45)
@@ -37,44 +27,51 @@ struct WelcomeView: View {
                     .kerning(-3)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.top, 30)
+                    .padding(.top, 25)
+                    .padding(.horizontal, 45)
                 Text("Intermittent Fasting & Water Tracker")
                     .font(
                         Font.custom("Lato-BlackItalic", size: 25)
                     )
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.top, 25)
+                    .padding(.top, 5)
+                    .padding(.horizontal, 45)
                 Text(combinedText)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.top, 30)
+                    .padding(.top, 20)
+                    .padding(.horizontal, 45)
                 Text("Together, they improve fat loss, curbs hunger, and maintains focus—making the fast more effective and easier to sustain.")
                     .font(
                         Font.custom("Lato-Regular", size: 16)
                     )
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.top, 10)
-                Spacer()
+                    .padding(.top, 5)
+                    .padding(.horizontal, 45)
+                Image("WelcomeFooter")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .clipped()
+                    .padding(.top, 30)
             }
-            .padding(.top, 30)
-            .padding([.horizontal, .bottom], 45)
-            VStack {
-                Spacer()
-                Button {
-                    coordinator.navigate(to: .dashboard)
-                } label: {
-                    Text("GET STARTED")
-                        .font(
-                            Font.custom("Lato-Black", size: 24)
-                        )
-                        .foregroundStyle(.white)
-                        .frame(width: 314, height: 70)
-                        .background(Color(hex: "1E2C4B"))
-                        .cornerRadius(30)
-                }
-                .padding(.bottom, 60)
+            Button {
+                coordinator.navigate(to: .dashboard)
+            } label: {
+                Text("GET STARTED")
+                    .font(
+                        Font.custom("Lato-Black", size: 24)
+                    )
+                    .foregroundStyle(.white)
+                    .frame(height: 70)
+                    .padding(.horizontal, 63)
+                    .background(Color(hex: "1E2C4B"))
+                    .cornerRadius(30)
             }
+            .frame(maxHeight: .infinity, alignment: .bottom)
+            .padding(.bottom, 20)
+            
         }
     }
 
@@ -90,36 +87,11 @@ struct WelcomeView: View {
         var text3 = AttributedString(" fast boosts your metabolism and hydration ensures detox and hunger control.")
         text3.font = .custom("Lato-Regular", size: 16)
         text3.foregroundColor = .white
-        
+
         return text1 + text2 + text3
     }
 }
 
 #Preview {
     WelcomeView()
-}
-
-extension Color {
-    init(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        let a, r, g, b: UInt64
-        switch hex.count {
-        case 6: // RGB (24-bit)
-            (a, r, g, b) = (255, (int >> 16) & 0xFF, (int >> 8) & 0xFF, int & 0xFF)
-        case 8: // ARGB (32-bit)
-            (a, r, g, b) = ((int >> 24) & 0xFF, (int >> 16) & 0xFF, (int >> 8) & 0xFF, int & 0xFF)
-        default:
-            (a, r, g, b) = (255, 0, 0, 0)
-        }
-
-        self.init(
-            .sRGB,
-            red: Double(r) / 255,
-            green: Double(g) / 255,
-            blue: Double(b) / 255,
-            opacity: Double(a) / 255
-        )
-    }
 }

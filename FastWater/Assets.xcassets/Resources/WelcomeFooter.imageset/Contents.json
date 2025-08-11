@@ -1,8 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "ChatGPT Image Apr 16, 2025, 07_18_38 PM 1.pdf",
-      "idiom" : "universal"
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "ChatGPT.png",
+      "idiom" : "universal",
+      "scale" : "3x"
     }
   ],
   "info" : {

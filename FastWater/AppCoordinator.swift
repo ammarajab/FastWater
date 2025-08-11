@@ -15,19 +15,25 @@ enum AppRoute: Hashable {
 }
 
 class AppCoordinator: ObservableObject {
+    @AppStorage("hasLaunchedBefore") private var hasLaunchedBefore: Bool = false
     @Published var path: NavigationPath
     @Published var root: AppRoute
 
     init() {
         UIScrollView.appearance().indicatorStyle = .white
-        let isFirstLaunch = true //UserDefaults.standard.bool(forKey: "isFirstLaunch")
         self.path = NavigationPath()
-        self.root = isFirstLaunch ? .welcome : .dashboard
+        self.root = .welcome
+
+    }
+
+    func setupLaunchState() {
+        self.root = hasLaunchedBefore ? .dashboard : .welcome
     }
 
     func navigate(to route: AppRoute) {
         switch route {
         case .dashboard:
+            hasLaunchedBefore = true
             path = NavigationPath()
             root = .dashboard
         case .settings:
@@ -42,7 +48,8 @@ class AppCoordinator: ObservableObject {
     }
 
     func buildRootView() -> some View {
-        Group {
+        setupLaunchState()
+        return Group {
             switch root {
             case .welcome:
                 WelcomeView()

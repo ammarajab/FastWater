@@ -23,7 +23,7 @@ class AppCoordinator: ObservableObject {
         UIScrollView.appearance().indicatorStyle = .white
         self.path = NavigationPath()
         self.root = .welcome
-
+        setupLaunchState()
     }
 
     func setupLaunchState() {
@@ -48,7 +48,6 @@ class AppCoordinator: ObservableObject {
     }
 
     func buildRootView() -> some View {
-        setupLaunchState()
         return Group {
             switch root {
             case .welcome:
@@ -59,13 +58,6 @@ class AppCoordinator: ObservableObject {
                     set: { self.path = $0 }
                 )) {
                     DashboardView()
-//                        .navigationDestination(for: AppRoute.self) { route in
-//                            switch route {
-//                            case .dashboard:
-//                                DashboardView()
-//                                    .navigationBarHidden(true)
-//                            }
-//                        }
                 }
             default:
                 WelcomeView()

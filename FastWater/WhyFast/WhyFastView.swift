@@ -91,7 +91,3 @@ struct WhyFastView: View {
         }
     }
 }
-
-#Preview {
-    WhyFastView(showWhyFast: .constant(false))
-}

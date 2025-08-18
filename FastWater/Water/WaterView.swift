@@ -93,10 +93,6 @@ struct WaterView: View {
     }
 }
 
-#Preview {
-    WaterView()
-}
-
 extension AnyTransition {
     static var moveUp: AnyTransition {
         .asymmetric(

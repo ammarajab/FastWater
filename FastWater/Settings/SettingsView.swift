@@ -17,7 +17,7 @@ struct SettingsView: View {
             RoundedRectangle(cornerRadius: 25)
                 .fill(Color.white)
                 .padding(.horizontal, 15)
-                .padding(.top, 20)
+                .padding(.top, 10)
                 .padding(.bottom, 30)
             Rectangle()
                 .fill(Color(hex: "20293A"))
@@ -160,18 +160,7 @@ struct SettingsView: View {
             }
             .padding(.horizontal, 15)
             .padding(.top, 20)
-            Button(action: {
-                print("SettingsButtonView")
-                showSettings = false
-            }) {
-                Image("SettingsNavBar")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 50, height: 50)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
-            .padding(.trailing, 25)
-            .padding(.top, 30)
+            SettingsButtonView(showSettings: $showSettings)
             if showWhyFast {
                 WhyFastView(showWhyFast: $showWhyFast)
             }
@@ -194,10 +183,6 @@ struct SettingsView: View {
         
         return text1 + text2 + text3
     }
-}
-
-#Preview {
-    SettingsView(showSettings: .constant(false))
 }
 
 struct WideToggleStyle: ToggleStyle {

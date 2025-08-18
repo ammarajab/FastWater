@@ -1,10 +1,12 @@
 {
   "images" : [
     {
+      "filename" : "home 2.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "home 1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

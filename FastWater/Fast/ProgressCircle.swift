@@ -10,58 +10,63 @@ import SwiftUI
 struct ProgressCircle: View {
     var progress: Double
     var isFasting: Bool
+    var sizeRatio: Double
 
     var body: some View {
         ZStack {
             Circle()
                 .trim(from: 0.0, to: min(progress, 1.0))
-                .stroke(Color(hex: "F96758"), style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                .stroke(AppColors.shapeCritical, style: StrokeStyle(lineWidth: 3, lineCap: .round))
                 .rotationEffect(.degrees(-90))
                 .animation(.easeInOut(duration: 0.5), value: progress)
             VStack (spacing: 0){
                 Spacer()
                 Text(daysText())
-                    .font(
-                        Font.custom("Lato-Black", size: 35)
-                    )
-                    .foregroundStyle(.white)
+                    .title2(size: 35)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.top, 10)
-                Text("8:12:10")
-                    .font(
-                        Font.custom("Lato-Black", size: 55)
-                    )
-                    .foregroundStyle(.white)
+                Text(Texts.time)
+                    .title2(size: 55)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.top, 3)
                 Text(fastText())
-                    .font(
-                        Font.custom("Lato-Regular", size: 16)
-                    )
-                    .foregroundStyle(.white)
+                    .body()
                     .frame(maxWidth: .infinity, alignment: .center)
                 Text(progressText())
-                    .font(
-                        Font.custom("Lato-BlackItalic", size: 32)
-                    )
-                    .foregroundStyle(Color(hex: "F96758"))
+                    .title(color: AppColors.textCritical)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.top, 12)
                 Spacer()
             }
         }
-        .frame(width: 250, height: 250)
+        .frame(width: size(), height: size())
     }
 
     func daysText() -> String {
-        isFasting ? "" : "2 days"
+        isFasting ? Texts.daysFasting : Texts.daysNotFasting
     }
 
     func fastText() -> String {
-        isFasting ? "time spent fasting..." : "since your last fast"
+        isFasting ? Texts.fasting : Texts.notFasting
     }
 
     func progressText() -> String {
-        isFasting ? "\(Int(progress * 100))%" : ""
+        isFasting ? Texts.progressFasting(progress: progress) : Texts.progressNotFasting
+    }
+
+    func size() -> Double {
+        2.5 * sizeRatio
+    }
+
+    struct Texts {
+        static let daysFasting = ""
+        static let daysNotFasting = "2 days"
+        static let time = "8:12:10"
+        static let fasting = "time spent fasting..."
+        static let notFasting = "since your last fast"
+        static func progressFasting(progress: Double) -> String {
+            "\(Int(progress * 100))%"
+        }
+        static let progressNotFasting = ""
     }
 }

@@ -9,19 +9,24 @@ import SwiftUI
 
 struct DashboardView: View {
     enum Tab: String {
-        case home, calendar, water
+        case fast, calendar, water
     }
 
-    @State private var selectedTab: Tab = .home
+    @State private var selectedTab: Tab = .fast
     @State private var showSettings = false
+    @State private var showFastPopup = false
+    @StateObject private var fastViewModel = FastViewModel()
 
     var body: some View {
         ZStack {
+            AppColors.backgroundPrimary
+                .ignoresSafeArea()
             VStack(spacing: 0) {
                 Group {
                     switch selectedTab {
-                    case .home:
-                        HomeView(showSettings: $showSettings)
+                    case .fast:
+                        FastView(showFastPopup: $showFastPopup)
+                            .environmentObject(fastViewModel)
                     case .calendar:
                         CalendarView()
                     case .water:
@@ -30,32 +35,39 @@ struct DashboardView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 HStack {
-                    tabBarItem(tab: .home, imageName: "HomeTabBar")
-                    tabBarItem(tab: .calendar, imageName: "CalendarTabBar")
-                    tabBarItem(tab: .water, imageName: "WaterTabBar")
+                    tabBarItem(tab: .fast, imageName: Images.fast)
+                    tabBarItem(tab: .calendar, imageName: Images.calendar)
+                    tabBarItem(tab: .water, imageName: Images.water)
                 }
-                .frame(height: 150)
-                .background(Color(hex: "1B232F"))
+                .frame(height: 150.deviceScaled())
+                .background(AppColors.backgroundSecondary)
             }
             .ignoresSafeArea(.keyboard, edges: .bottom)
             .edgesIgnoringSafeArea(.bottom)
+            SettingsButtonView(showSettings: $showSettings)
             if showSettings {
                 ZStack {
-                    Color(hex: "081325").opacity(0.3).ignoresSafeArea()
+                    AppColors.backgroundPrimary.opacity(0.3).ignoresSafeArea()
                     VisualEffectBlur(blurStyle: .systemUltraThinMaterialDark)
                         .ignoresSafeArea()
                 }
-//                .onTapGesture {
-//                    withAnimation {
-//                        showSettings = false
-//                    }
-//                }
                 SettingsView(showSettings: $showSettings)
             }
+            if showFastPopup {
+                AppColors.backgroundPrimary.opacity(0.3).ignoresSafeArea()
+                VisualEffectBlur(blurStyle: .systemUltraThinMaterialDark)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        showFastPopup = false
+                    }
+                FastPopupView(showFastPopup: $showFastPopup)
+                    .environmentObject(fastViewModel)
+            }
         }
+        .animation(.easeInOut, value: showFastPopup)
+        .animation(.easeInOut, value: showSettings)
     }
-    
-    @ViewBuilder
+
     private func tabBarItem(tab: Tab, imageName: String) -> some View {
         Button(action: {
             selectedTab = tab
@@ -63,16 +75,22 @@ struct DashboardView: View {
             ZStack {
                 if selectedTab == tab {
                     Rectangle()
-                        .fill(Color(hex: "081325"))
-                        .frame(width: 150, height: 150)
+                        .fill(AppColors.backgroundPrimary)
+                        .frame(width: UIScreen.main.bounds.width / 3, height: 150.deviceScaled())
                 }
                 
                 Image(imageName)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 108, height: 108)
+                    .frame(width: 108.deviceScaled(), height: 108.deviceScaled())
             }
             .frame(maxWidth: .infinity)
         }
+    }
+
+    struct Images {
+        static let fast = "FastTabBar"
+        static let calendar = "CalendarTabBar"
+        static let water = "WaterTabBar"
     }
 }

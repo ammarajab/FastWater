@@ -150,7 +150,3 @@ struct CalendarView: View {
         return (yearName, monthName, numberOfDays, weekday - 1)
     }
 }
-
-#Preview {
-    CalendarView()
-}

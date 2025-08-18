@@ -18,8 +18,11 @@ struct WelcomeView: View {
                 .ignoresSafeArea()
             VStack {
                 Image(Images.header)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 160.deviceScaled(), height: 120.deviceScaled(), alignment: .leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 45)
+                    .padding(.leading, 45)
                 Text(Texts.title)
                     .title2(size: 45, letterSpacing: -3)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -51,14 +54,13 @@ struct WelcomeView: View {
             } label: {
                 Text(Texts.button)
                     .title2()
-                    .frame(height: 70)
-                    .padding(.horizontal, 63)
-                    .background(Color(hex: "1E2C4B"))
+                    .frame(height: 70.deviceScaled())
+                    .padding(.horizontal, 70)
+                    .background(AppColors.buttonSecondary)
                     .cornerRadius(30)
             }
             .frame(maxHeight: .infinity, alignment: .bottom)
             .padding(.bottom, 20)
-            
         }
     }
 
@@ -89,8 +91,4 @@ struct WelcomeView: View {
         static let bodyPart2 = "Together, they improve fat loss, curbs hunger, and maintains focus—making the fast more effective and easier to sustain."
         static let button = "GET STARTED"
     }
-}
-
-#Preview {
-    WelcomeView()
 }

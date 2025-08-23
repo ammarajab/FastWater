@@ -22,14 +22,12 @@ struct FastView: View {
                 let originalSide = UIImage(named: Images.clock)?.size.width ?? 1
                 let displaySide  = geo.size.width
                 let percent      = (displaySide / originalSide) * 100
-                return ZStack {
+                ZStack {
                     Image(Images.clock)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .clipped()
-                    ProgressCircle(progress: fastViewModel.progress,
-                                   isFasting: fastViewModel.isFasting,
-                                   sizeRatio: percent)
+                    ProgressCircle(sizeRatio: percent)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 }
             }
@@ -50,6 +48,8 @@ struct FastView: View {
             }
             .padding(.bottom, 30)
         }
+        .onAppear { fastViewModel.onAppear() }
+        .onDisappear { fastViewModel.onDisappear() }
     }
 
     struct Images {

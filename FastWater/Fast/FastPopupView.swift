@@ -23,7 +23,7 @@ struct FastPopupView: View {
             .padding(.bottom, 28)
             Button(action: {
                 showFastPopup = false
-                fastViewModel.stopFasting()
+                fastViewModel.saveFast()
             }) {
                 HStack {
                     Spacer()
@@ -39,12 +39,12 @@ struct FastPopupView: View {
                 .clipShape(RoundedCorner(radius: 25, corners: [.topLeft, .topRight]))
             }
             Rectangle()
-                .fill(AppColors.shapeDivider)
+                .fill(AppColors.shapePrimary)
                 .frame(height: 1)
                 .padding(.horizontal, 1)
             Button(action: {
                 showFastPopup = false
-                fastViewModel.stopFasting()
+                fastViewModel.deleteFast()
             }) {
                 HStack {
                     Spacer()

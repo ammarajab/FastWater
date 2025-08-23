@@ -15,7 +15,16 @@ struct DashboardView: View {
     @State private var selectedTab: Tab = .fast
     @State private var showSettings = false
     @State private var showFastPopup = false
-    @StateObject private var fastViewModel = FastViewModel()
+    @EnvironmentObject private var fastingManager: FastingManager
+    @EnvironmentObject private var fastingRecordManager: FastingRecordManager
+    @StateObject private var fastViewModel: FastViewModel
+    @StateObject private var calendarViewModel: CalendarViewModel
+
+    init() {
+        let fastingRecordManager = FastingRecordManager()
+        _fastViewModel = StateObject(wrappedValue: FastViewModel(fastingManager: FastingManager(fastingRecordManager: fastingRecordManager)))
+        _calendarViewModel = StateObject(wrappedValue: CalendarViewModel(fastingRecordManager: fastingRecordManager))
+    }
 
     var body: some View {
         ZStack {
@@ -29,6 +38,7 @@ struct DashboardView: View {
                             .environmentObject(fastViewModel)
                     case .calendar:
                         CalendarView()
+                            .environmentObject(calendarViewModel)
                     case .water:
                         WaterView()
                     }
@@ -40,7 +50,7 @@ struct DashboardView: View {
                     tabBarItem(tab: .water, imageName: Images.water)
                 }
                 .frame(height: 150.deviceScaled())
-                .background(AppColors.backgroundSecondary)
+                .background(AppColors.backgroundMuted)
             }
             .ignoresSafeArea(.keyboard, edges: .bottom)
             .edgesIgnoringSafeArea(.bottom)

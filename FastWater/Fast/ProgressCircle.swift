@@ -8,25 +8,24 @@
 import SwiftUI
 
 struct ProgressCircle: View {
-    var progress: Double
-    var isFasting: Bool
+    @EnvironmentObject var fastViewModel: FastViewModel
+
     var sizeRatio: Double
 
     var body: some View {
         ZStack {
             Circle()
-                .trim(from: 0.0, to: min(progress, 1.0))
+                .trim(from: 0.0, to: min(fastViewModel.progress, 1.0))
                 .stroke(AppColors.shapeCritical, style: StrokeStyle(lineWidth: 3, lineCap: .round))
                 .rotationEffect(.degrees(-90))
-                .animation(.easeInOut(duration: 0.5), value: progress)
+                .animation(.easeInOut(duration: 0.5), value: fastViewModel.progress)
             VStack (spacing: 0){
                 Spacer()
                 Text(daysText())
                     .title2(size: 35)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.top, 10)
-                Text(Texts.time)
-                    .title2(size: 55)
+                combinedText
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.top, 3)
                 Text(fastText())
@@ -42,16 +41,30 @@ struct ProgressCircle: View {
         .frame(width: size(), height: size())
     }
 
+    var combinedText: Text {
+        Text(Texts.timePart1(hours: fastViewModel.time.hours, minutes: fastViewModel.time.minutes))
+            .title2(size: 50)
+        +
+        Text(Texts.timePart2(seconds: fastViewModel.time.seconds))
+            .title2(size: 35, color: AppColors.textMuted)
+    }
+
     func daysText() -> String {
-        isFasting ? Texts.daysFasting : Texts.daysNotFasting
+        if fastViewModel.time.days == 0 {
+            return ""
+        }
+        if fastViewModel.time.days == 1 {
+            return "1 day"
+        }
+        return "\(fastViewModel.time.days) days"
     }
 
     func fastText() -> String {
-        isFasting ? Texts.fasting : Texts.notFasting
+        fastViewModel.isFasting ? Texts.fasting : Texts.notFasting
     }
 
     func progressText() -> String {
-        isFasting ? Texts.progressFasting(progress: progress) : Texts.progressNotFasting
+        fastViewModel.isFasting ? Texts.progressFasting(progress: fastViewModel.progress) : Texts.progressNotFasting
     }
 
     func size() -> Double {
@@ -59,13 +72,16 @@ struct ProgressCircle: View {
     }
 
     struct Texts {
-        static let daysFasting = ""
-        static let daysNotFasting = "2 days"
-        static let time = "8:12:10"
+        static func timePart1 (hours: Int, minutes: Int) -> String {
+            "\(String(format: "%02d", hours)):\(String(format: "%02d", minutes)):"
+        }
+        static func timePart2 (seconds: Int) -> String {
+            "\(String(format: "%02d", seconds))"
+        }
         static let fasting = "time spent fasting..."
         static let notFasting = "since your last fast"
         static func progressFasting(progress: Double) -> String {
-            "\(Int(progress * 100))%"
+            "\(Int((min(progress, 1.0) * 100).rounded()))%"
         }
         static let progressNotFasting = ""
     }

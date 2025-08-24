@@ -15,15 +15,19 @@ struct DashboardView: View {
     @State private var selectedTab: Tab = .fast
     @State private var showSettings = false
     @State private var showFastPopup = false
+    @State private var showWaterReminderPicker = false
+    @State private var waterReminderPickerType: WaterReminderPickerType?
     @EnvironmentObject private var fastingManager: FastingManager
     @EnvironmentObject private var fastingRecordManager: FastingRecordManager
     @StateObject private var fastViewModel: FastViewModel
     @StateObject private var calendarViewModel: CalendarViewModel
+    @StateObject private var waterViewModel: WaterViewModel
 
     init() {
         let fastingRecordManager = FastingRecordManager()
         _fastViewModel = StateObject(wrappedValue: FastViewModel(fastingManager: FastingManager(fastingRecordManager: fastingRecordManager)))
         _calendarViewModel = StateObject(wrappedValue: CalendarViewModel(fastingRecordManager: fastingRecordManager))
+        _waterViewModel = StateObject(wrappedValue: WaterViewModel(waterManager: WaterManager()))
     }
 
     var body: some View {
@@ -40,7 +44,9 @@ struct DashboardView: View {
                         CalendarView()
                             .environmentObject(calendarViewModel)
                     case .water:
-                        WaterView()
+                        WaterView(showWaterReminderPicker: $showWaterReminderPicker,
+                                  waterReminderPickerType: $waterReminderPickerType,
+                                  viewModel: waterViewModel)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -56,26 +62,31 @@ struct DashboardView: View {
             .edgesIgnoringSafeArea(.bottom)
             SettingsButtonView(showSettings: $showSettings)
             if showSettings {
-                ZStack {
-                    AppColors.backgroundPrimary.opacity(0.3).ignoresSafeArea()
-                    VisualEffectBlur(blurStyle: .systemUltraThinMaterialDark)
-                        .ignoresSafeArea()
-                }
+                BlurBackgroundView()
                 SettingsView(showSettings: $showSettings)
             }
             if showFastPopup {
-                AppColors.backgroundPrimary.opacity(0.3).ignoresSafeArea()
-                VisualEffectBlur(blurStyle: .systemUltraThinMaterialDark)
-                    .ignoresSafeArea()
+                BlurBackgroundView()
                     .onTapGesture {
                         showFastPopup = false
                     }
                 FastPopupView(showFastPopup: $showFastPopup)
                     .environmentObject(fastViewModel)
             }
+            if showWaterReminderPicker,
+               let waterReminderPickerType {
+                BlurBackgroundView()
+                    .onTapGesture {
+                        showWaterReminderPicker = false
+                    }
+                WaterReminderPickerView(pickerType: waterReminderPickerType,
+                                        showWaterReminderPicker: $showWaterReminderPicker,
+                                        viewModel: waterViewModel)
+            }
         }
-        .animation(.easeInOut, value: showFastPopup)
         .animation(.easeInOut, value: showSettings)
+        .animation(.easeInOut, value: showFastPopup)
+        .animation(.easeInOut, value: showWaterReminderPicker)
     }
 
     private func tabBarItem(tab: Tab, imageName: String) -> some View {

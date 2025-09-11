@@ -31,6 +31,8 @@ struct WaterView: View {
                         .clipped()
                         .transition(.moveUp)
                         .onTapGesture {
+                            let generator = UIImpactFeedbackGenerator(style: .heavy)
+                            generator.impactOccurred()
                             withAnimation(.easeInOut(duration: 0.4)) {
                                 viewModel.toggleCup(index)
                             }

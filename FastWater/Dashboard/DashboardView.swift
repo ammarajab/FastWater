@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct DashboardView: View {
     enum Tab: String {
@@ -19,13 +20,16 @@ struct DashboardView: View {
     @State private var waterReminderPickerType: WaterReminderPickerType?
     @EnvironmentObject private var fastingManager: FastingManager
     @EnvironmentObject private var fastingRecordManager: FastingRecordManager
+    @Environment(\.modelContext) private var modelContext
     @StateObject private var fastViewModel: FastViewModel
     @StateObject private var calendarViewModel: CalendarViewModel
     @StateObject private var waterViewModel: WaterViewModel
 
     init() {
         let fastingRecordManager = FastingRecordManager()
-        _fastViewModel = StateObject(wrappedValue: FastViewModel(fastingManager: FastingManager(fastingRecordManager: fastingRecordManager)))
+        let repo = SwiftDataFastingRepository(context: ModelContext(try! ModelContainer(for: CurrentFast.self)))
+        let fastingRepo = SwiftDataFastingRepository(context: repo.context)
+        _fastViewModel = StateObject(wrappedValue: FastViewModel(fastingManager: FastingManager(fastingRecordManager: fastingRecordManager, repo: fastingRepo)))
         _calendarViewModel = StateObject(wrappedValue: CalendarViewModel(fastingRecordManager: fastingRecordManager))
         _waterViewModel = StateObject(wrappedValue: WaterViewModel(waterManager: WaterManager()))
     }

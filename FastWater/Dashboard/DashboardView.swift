@@ -26,12 +26,12 @@ struct DashboardView: View {
     @StateObject private var waterViewModel: WaterViewModel
 
     init() {
-        let fastingRecordManager = FastingRecordManager()
-        let repo = SwiftDataFastingRepository(context: ModelContext(try! ModelContainer(for: CurrentFast.self)))
+        let repo = SwiftDataFastingRepository(context: ModelContext(try! ModelContainer(for: CurrentFast.self, FastsContainer.self, WaterInfo.self)))
+        let fastingRecordManager = FastingRecordManager(repo: repo)
         let fastingRepo = SwiftDataFastingRepository(context: repo.context)
         _fastViewModel = StateObject(wrappedValue: FastViewModel(fastingManager: FastingManager(fastingRecordManager: fastingRecordManager, repo: fastingRepo)))
         _calendarViewModel = StateObject(wrappedValue: CalendarViewModel(fastingRecordManager: fastingRecordManager))
-        _waterViewModel = StateObject(wrappedValue: WaterViewModel(waterManager: WaterManager()))
+        _waterViewModel = StateObject(wrappedValue: WaterViewModel(waterManager: WaterManager(repo: fastingRepo)))
     }
 
     var body: some View {

@@ -9,134 +9,234 @@ import Foundation
 import SwiftData
 
 //@Model
-//final class HydrationSettings {
-//    @Attribute(.unique) var id: String = "HYDRATION_SETTINGS"
-//    var reminderStart: Date
-//    var reminderEnd: Date
+//final class CurrentFast {
+//    @Attribute(.unique) var key: String = "CURRENT_FAST"
+//    var startTime: Date?
+//    var endTime: Date?
 //
-//    init(reminderStart: Date, reminderEnd: Date) {
-//        self.reminderStart = reminderStart
-//        self.reminderEnd = reminderEnd
+//    init(start: Date? = nil, end: Date? = nil) {
+//        self.startTime = start
+//        self.endTime = end
 //    }
-//}
-//
-//@Model
-//final class HydrationDay {
-//    // One row per calendar day
-//    @Attribute(.unique) var dayStart: Date // normalized to startOfDay
-//    // Always length 8. We keep it as an array for clarity.
-//    var cups: [Bool]
-//
-//    init(dayStart: Date, cups: [Bool] = Array(repeating: false, count: 8)) {
-//        self.dayStart = dayStart.startOfDay
-//        self.cups = HydrationDay.normalized(cups)
-//    }
-//
-//    static func normalized(_ cups: [Bool]) -> [Bool] {
-//        let n = 8
-//        if cups.count == n { return cups }
-//        if cups.count > n { return Array(cups.prefix(n)) }
-//        return cups + Array(repeating: false, count: n - cups.count)
-//    }
-//
-//    func toggleCup(at index: Int) {
-//        guard (0..<8).contains(index) else { return }
-//        cups[index].toggle()
-//    }
-//}
-
-//@Model
-//final class Fast {
-//    var start: Date
-//    var end: Date
-//
-//    init(start: Date, end: Date) {
-//        self.start = start
-//        self.end = end
-//    }
-//
-//    var durationSeconds: TimeInterval { end.timeIntervalSince(start) }
-//}
-//
-//// MARK: - Day helper
-//extension Date {
-//    var startOfDay: Date { Calendar.current.startOfDay(for: self) }
 //}
 
 @Model
-final class CurrentFast {
-    @Attribute(.unique) var key: String = "CURRENT_FAST"
-    var fastingStartTime: Date?
-    var fastingEndTime: Date?
+public final class Fast {
+    @Attribute var startTime: Date
+    @Attribute var endTime: Date
 
-    init(start: Date? = nil, end: Date? = nil) {
-        self.fastingStartTime = start
-        self.fastingEndTime = end
+    var year: Int {
+        endTime.year
+    }
+
+    var month: Int {
+        endTime.month
+    }
+
+    init(startTime: Date, endTime: Date) {
+        self.startTime = startTime
+        self.endTime = endTime
+    }
+
+    init?(currentFast: CurrentFast) {
+        guard let startTime = currentFast.startTime,
+              let endTime = currentFast.endTime else {
+            return nil
+        }
+        self.startTime = startTime
+        self.endTime = endTime
+    }
+}
+
+@Model
+final class CurrentFast {
+    var startTime: Date?
+    var endTime: Date?
+
+    init(startTime: Date? = nil, endTime: Date? = nil) {
+        self.startTime = startTime
+        self.endTime = endTime
+    }
+}
+
+@Model
+final class FastsContainer {
+    @Relationship(deleteRule: .cascade) var fasts: [Fast] = []
+
+    init(fasts: [Fast] = []) {
+        self.fasts = fasts
+    }
+}
+
+@Model
+final class WaterInfo {
+    var waterCups: [Bool]
+    var reminderStart: Date
+    var reminderEnd: Date
+    var lastOpenDate: Date
+
+    init(
+        waterCups: [Bool] = [false,false,false,false,false,false,false,false],
+        reminderStart: Date = Calendar.current.date(from: DateComponents(hour: 7, minute: 0)) ?? Date(),
+        reminderEnd: Date = Calendar.current.date(from: DateComponents(hour: 21, minute: 0)) ?? Date(),
+        lastOpenDate: Date = Date()
+    ) {
+        self.waterCups = waterCups
+        self.reminderStart = reminderStart
+        self.reminderEnd = reminderEnd
+        self.lastOpenDate = lastOpenDate
     }
 }
 
 protocol FastingRepository {
-    func getCurrent() throws -> CurrentFast
+    func getCurrentFast() throws -> CurrentFast
+    func getFastsContainer() throws -> FastsContainer
+    func getWaterInfo() throws -> WaterInfo
     func startFast() throws
     func endFast() throws
     func deleteFast() throws
-//    func allFasts() throws -> [Fast]
+    func setReminderWindow(start: Date, end: Date) throws
+    func toggleCup(_ index: Int) throws
+    func resetCupsToday() throws
+    func setLastOpenDate() throws
 }
 
 final class SwiftDataFastingRepository: FastingRepository {
     let context: ModelContext
     init(context: ModelContext) { self.context = context }
 
-    func getCurrent() throws -> CurrentFast {
+    func getCurrentFast() throws -> CurrentFast {
         let fd = FetchDescriptor<CurrentFast>()
-        if let c = try context.fetch(fd).first {
-            return c
+        if let currentFast = try context.fetch(fd).first {
+            return currentFast
         }
-        let c = CurrentFast()
-        context.insert(c)
+        let currentFast = CurrentFast()
+        context.insert(currentFast)
         try context.save()
-        return c
+        return currentFast
+    }
+
+    func getFastsContainer() throws -> FastsContainer {
+        let fd = FetchDescriptor<FastsContainer>()
+        if let fastsContainer = try context.fetch(fd).first {
+            return fastsContainer
+        }
+        let fastsContainer = FastsContainer(fasts: createDummyFasts())
+        context.insert(fastsContainer)
+        try context.save()
+        return fastsContainer
+    }
+
+    func getWaterInfo() throws -> WaterInfo {
+        let fd = FetchDescriptor<WaterInfo>()
+        if let waterInfo = try context.fetch(fd).first {
+            return waterInfo
+        }
+        let waterInfo = WaterInfo()
+        context.insert(waterInfo)
+        try context.save()
+        return waterInfo
+    }
+
+    func createDummyFasts() -> [Fast] {
+        [
+            Fast(startTime: createDummyDate(day: 4, start: true),
+                 endTime: createDummyDate(day: 4)),
+            Fast(startTime: createDummyDate(day: 5, start: true),
+                 endTime: createDummyDate(day: 5)),
+            Fast(startTime: createDummyDate(day: 6, start: true),
+                 endTime: createDummyDate(day: 6)),
+            Fast(startTime: createDummyDate(day: 7, start: true),
+                 endTime: createDummyDate(day: 7)),
+            Fast(startTime: createDummyDate(day: 8, start: true),
+                 endTime: createDummyDate(day: 8)),
+
+            Fast(startTime: createDummyDate(day: 11, start: true),
+                 endTime: createDummyDate(day: 11)),
+            Fast(startTime: createDummyDate(day: 12, start: true),
+                 endTime: createDummyDate(day: 12)),
+            Fast(startTime: createDummyDate(day: 13, start: true),
+                 endTime: createDummyDate(day: 13)),
+            Fast(startTime: createDummyDate(day: 14, start: true),
+                 endTime: createDummyDate(day: 14)),
+            Fast(startTime: createDummyDate(day: 15, start: true),
+                 endTime: createDummyDate(day: 15)),
+
+            Fast(startTime: createDummyDate(day: 18, start: true),
+                 endTime: createDummyDate(day: 18)),
+            Fast(startTime: createDummyDate(day: 19, start: true),
+                 endTime: createDummyDate(day: 19)),
+            Fast(startTime: createDummyDate(day: 20, start: true),
+                 endTime: createDummyDate(day: 20)),
+            Fast(startTime: createDummyDate(day: 21, start: true),
+                 endTime: createDummyDate(day: 21)),
+            Fast(startTime: createDummyDate(day: 22, start: true),
+                 endTime: createDummyDate(day: 22)),
+
+            Fast(startTime: createDummyDate(day: 25, start: true),
+                 endTime: createDummyDate(day: 25)),
+            Fast(startTime: createDummyDate(day: 26, start: true),
+                 endTime: createDummyDate(day: 26)),
+            Fast(startTime: createDummyDate(day: 27, start: true),
+                 endTime: createDummyDate(day: 27)),
+            Fast(startTime: createDummyDate(day: 28, start: true),
+                 endTime: createDummyDate(day: 28)),
+            Fast(startTime: createDummyDate(day: 29, start: true),
+                 endTime: createDummyDate(day: 29))
+        ]
     }
 
     func startFast() throws {
-        let c = try getCurrent()
+        let currentFast = try getCurrentFast()
 //        guard !c.isActive else { return }
-        c.fastingStartTime = Date()
-        c.fastingEndTime = nil
+        currentFast.startTime = Date()
+        currentFast.endTime = nil
         try context.save()
     }
 
     func endFast() throws {
-        let c = try getCurrent()
-        guard c.fastingStartTime != nil, c.fastingEndTime == nil else { return }
+        let currentFast = try getCurrentFast()
+        guard currentFast.startTime != nil, currentFast.endTime == nil else { return }
         let end = Date()
-        c.fastingEndTime = end
-        // Persist a historical record
-//        context.insert(Fast(start: start, end: end))
+        currentFast.endTime = end
         try context.save()
+        guard let fast = Fast(currentFast: currentFast) else {
+            return
+        }
+        let fastsContainer = try getFastsContainer()
+        fastsContainer.fasts.append(fast)
     }
 
     func deleteFast() throws {
-        let c = try getCurrent()
-        c.fastingStartTime = nil
-        c.fastingEndTime = nil
+        let currentFast = try getCurrentFast()
+        currentFast.startTime = nil
+        currentFast.endTime = nil
         try context.save()
     }
 
-//    func clearCurrent() throws {
-//        let c = try getOrCreateCurrent()
-//        c.fastingStartTime = nil
-//        c.fastingEndTime = nil
-//        try context.save()
-//    }
-//
-//    func logFast(start: Date, end: Date) throws {
-//        context.insert(Fast(start: start, end: end))
-//        try context.save()
-//    }
-//
-//    func allFasts() throws -> [Fast] {
-//        let fd = FetchDescriptor<Fast>(sortBy: [SortDescriptor(\.start, order: .reverse)])
-//        return try context.fetch(fd)
-//    }
+    func setReminderWindow(start: Date, end: Date) throws {
+        let waterInfo = try getWaterInfo()
+        waterInfo.reminderStart = start
+        waterInfo.reminderEnd = end
+        try context.save()
+    }
+
+    func toggleCup(_ index: Int) throws {
+        let waterInfo = try getWaterInfo()
+        guard index < waterInfo.waterCups.count else { return }
+        waterInfo.waterCups[index].toggle()
+        try context.save()
+    }
+
+    func resetCupsToday() throws {
+        let waterInfo = try getWaterInfo()
+        waterInfo.waterCups = Array(repeating: false, count: 8)
+        try context.save()
+    }
+
+    func setLastOpenDate() throws {
+        let waterInfo = try getWaterInfo()
+        waterInfo.lastOpenDate = Date()
+        try context.save()
+    }
 }

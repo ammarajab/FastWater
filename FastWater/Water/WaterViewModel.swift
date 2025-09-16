@@ -12,20 +12,32 @@ final class WaterViewModel: ObservableObject {
     private let waterManager: WaterManager
     private var cancellables = Set<AnyCancellable>()
     @Published private(set) var waterCups: [Bool] = []
-    @Published var waterReminderStart: Date = Date()
-    @Published var waterReminderEnd: Date = Date()
+    @Published var reminderStart: Date = Date() {
+        didSet { waterManager.reminderStart = reminderStart }
+    }
+    @Published var reminderEnd: Date = Date() {
+        didSet { waterManager.reminderEnd = reminderEnd }
+    }
 
     init(waterManager: WaterManager) {
         self.waterManager = waterManager
         waterManager.$waterCups
             .receive(on: DispatchQueue.main)
             .assign(to: &$waterCups)
-        waterManager.$waterReminderStart
+        waterManager.$reminderStart
             .receive(on: DispatchQueue.main)
-            .assign(to: &$waterReminderStart)
-        waterManager.$waterReminderEnd
+            .sink { [weak self] new in
+                guard self?.reminderStart != new else { return }
+                self?.reminderStart = new
+            }
+            .store(in: &cancellables)
+        waterManager.$reminderEnd
             .receive(on: DispatchQueue.main)
-            .assign(to: &$waterReminderEnd)
+            .sink { [weak self] new in
+                guard self?.reminderEnd != new else { return }
+                self?.reminderEnd = new
+            }
+            .store(in: &cancellables)
     }
 
     var fullGlasses: Int {
@@ -37,11 +49,11 @@ final class WaterViewModel: ObservableObject {
     }
 
     var startTimeText: String {
-        format(waterReminderStart)
+        format(reminderStart)
     }
 
     var endTimeText: String {
-        format(waterReminderEnd)
+        format(reminderEnd)
     }
 
     func toggleCup(_ index: Int) {

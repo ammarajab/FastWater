@@ -62,9 +62,9 @@ struct WaterReminderPickerView: View {
     private func getSelection() -> Binding<Date> {
         switch type {
         case .start:
-            return $viewModel.waterReminderStart
+            return $viewModel.reminderStart
         case .end:
-            return $viewModel.waterReminderEnd
+            return $viewModel.reminderEnd
         }
     }
 

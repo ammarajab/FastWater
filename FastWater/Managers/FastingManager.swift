@@ -12,34 +12,34 @@ import Combine
 public final class FastingManager: ObservableObject {
     private let fastingRecordManager: FastingRecordManager
     @Published public private(set) var isFasting: Bool // = false
-    @Published public private(set) var fastingStartTime: Date?
-    @Published public private(set) var fastingEndTime: Date? // = Date().addingTimeInterval(-72 * 60 * 60)
+    @Published public private(set) var startTime: Date?
+    @Published public private(set) var endTime: Date? // = Date().addingTimeInterval(-72 * 60 * 60)
     private let repo: FastingRepository
 
     init(fastingRecordManager: FastingRecordManager,
          repo: FastingRepository) {
         self.fastingRecordManager = fastingRecordManager
         self.repo = repo
-        let currentFast = try? repo.getCurrent()
-        fastingStartTime = currentFast?.fastingStartTime
-        fastingEndTime = currentFast?.fastingEndTime
-        isFasting = (currentFast?.fastingStartTime != nil) && (currentFast?.fastingEndTime == nil)
+        let currentFast = try? repo.getCurrentFast()
+        startTime = currentFast?.startTime
+        endTime = currentFast?.endTime
+        isFasting = (currentFast?.startTime != nil) && (currentFast?.endTime == nil)
     }
 
     public func startFast() {
         isFasting = true
-        fastingStartTime = Date()
+        startTime = Date()
         try? repo.startFast()
     }
 
     public func saveFast() {
         guard isFasting else { return }
         isFasting = false
-        fastingEndTime = Date()
-        if let fastingStartTime,
-           let fastingEndTime {
-            fastingRecordManager.addFast(Fast(startDate: fastingStartTime, endDate: fastingEndTime))
-        }
+        endTime = Date()
+        if let startTime,
+           let endTime {
+            fastingRecordManager.addFast(Fast(startTime: startTime, endTime: endTime))
+        }        
         try? repo.endFast()
     }
 

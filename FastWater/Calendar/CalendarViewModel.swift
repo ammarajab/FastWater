@@ -63,14 +63,14 @@ final class CalendarViewModel: ObservableObject {
         let monthFasts = yearFasts?[selectedMonth]
         selectedMonthFasts = monthFasts ?? []
         let secondsFasted = selectedMonthFasts.reduce(0) { partialResult, fast in
-            partialResult + fast.endDate.timeIntervalSince(fast.startDate)
+            partialResult + fast.endTime.timeIntervalSince(fast.startTime)
         }
         hoursFasted = Int(secondsFasted / (60*60))
     }
 
     func colorForDay(day: Int) -> Color {
         let isFastingDay = selectedMonthFasts.contains {
-            Calendar.current.component(.day, from: $0.endDate) == day
+            Calendar.current.component(.day, from: $0.endTime) == day
         }
         return isFastingDay ? AppColors.shapeCritical : AppColors.shapeMuted
     }

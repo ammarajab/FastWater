@@ -57,7 +57,7 @@ final class FastViewModel: ObservableObject {
     }
 
     private func recompute() {
-        let baseline = (fastingManager.isFasting ? fastingManager.fastingStartTime : fastingManager.fastingEndTime) ?? Date()
+        let baseline = (fastingManager.isFasting ? fastingManager.startTime : fastingManager.endTime) ?? Date()
         let elapsed = max(0, Int(Date().timeIntervalSince(baseline)))
         time = Self.parts(from: elapsed)
         progress = fastingManager.isFasting ? min(1, Double(elapsed) / goalSeconds) : 0

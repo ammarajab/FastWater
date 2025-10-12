@@ -12,7 +12,7 @@ struct SettingsButtonView: View {
     
     var body: some View {
         Button(action: {
-//            showSettings.toggle()
+            showSettings.toggle()
         }) {
             Image(Images.settings)
                 .resizable()

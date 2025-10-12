@@ -15,43 +15,35 @@ struct SettingsView: View {
     var body: some View {
         ZStack( alignment: .top) {
             RoundedRectangle(cornerRadius: 25)
-                .fill(Color.white)
+                .fill(AppColors.backgroundInverse)
                 .padding(.horizontal, 15)
                 .padding(.top, 10)
-                .padding(.bottom, 30)
+                .padding(.bottom, 25.deviceScaled())
             Rectangle()
-                .fill(Color(hex: "20293A"))
-                .frame(height: 318)
+                .fill(AppColors.backgroundTertiary)
+                .frame(height: 318.deviceScaled())
                 .padding(.horizontal, 15)
                 .padding(.top, 114)
             VStack (spacing: 0){
-                Text("Settings")
-                    .font(
-                        Font.custom("Lato-BlackItalic", size: 32)
-                    )
-                    .foregroundStyle(Color(hex: "081325"))
+                Text(Texts.title)
+                    .title(color: AppColors.textInverse)
+                    .foregroundStyle(AppColors.textInverse)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.top, 15)
-                Image("SettingsHeader")
+                Image(Images.header)
                     .padding(.top, 10)
-                Text(combinedText)
+                combinedText
                     .frame(maxWidth: .infinity, alignment: .center)
-                Text("Subscribe Now")
-                    .font(
-                        Font.custom("Lato-Bold", size: 40)
-                    )
-                    .foregroundStyle(Color.white)
+                Text(Texts.subscribeTitle)
+                    .title2(size: 40)
                     .frame(maxWidth: .infinity, alignment: .center)
                 Button {
                     
                 } label: {
-                    Text("$1.99 per month")
-                        .font(
-                            Font.custom("Lato-Black", size: 24)
-                        )
-                        .foregroundStyle(.white)
-                        .frame(width: 251, height: 56)
-                        .background(Color(hex: "F96758"))
+                    Text(Texts.subscribe1)
+                        .title2()
+                        .frame(width: 251.deviceScaled(), height: 56.deviceScaled())
+                        .background(AppColors.buttonPrimary)
                         .cornerRadius(30)
                 }
                 .padding(.top, 20)
@@ -59,104 +51,85 @@ struct SettingsView: View {
                     Button {
                         
                     } label: {
-                        Text("$19.99 per year")
-                            .font(
-                                Font.custom("Lato-Black", size: 30)
-                            )
-                            .foregroundStyle(.white)
-                            .frame(width: 314, height: 70)
-                            .background(Color(hex: "F96758"))
+                        Text(Texts.subscribe2)
+                            .title2(size: 30)
+                            .frame(width: 314.deviceScaled(), height: 70.deviceScaled())
+                            .background(AppColors.buttonPrimary)
                             .cornerRadius(30)
                     }
-                    Image("SettingsSubscribe")
+                    Image(Images.subscribe)
                         .resizable()
-                        .frame(width: 80, height: 80)
+                        .frame(width: 80.deviceScaled(), height: 80.deviceScaled())
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                         .padding(.leading, 20)
                 }
-                .frame(height: 145)
+                .frame(height: 145.deviceScaled())
                 HStack {
-                    Text("Why Fast?")
-                        .font(
-                            Font.custom("Lato-Black", size: 24)
-                        )
-                        .foregroundStyle(Color(hex: "081325"))
+                    Text(Texts.whyFast)
+                        .title2(color: AppColors.textInverse)
                     Spacer()
                     Button(action: {
                         showWhyFast = true
                     }) {
-                        Image("SettingsNext")
+                        Image(Images.next)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 55, height: 55)
                     }
                 }
                 .padding(.horizontal, 30)
-                .frame(height: 80)
+                .frame(height: 80.deviceScaled())
                 Rectangle()
-                    .fill(Color(hex: "B8B8B8"))
+                    .fill(AppColors.backgroundSeparator)
                     .frame(height: 1)
                 HStack {
-                    Text("Water Reminders")
-                        .font(
-                            Font.custom("Lato-Regular", size: 24)
-                        )
-                        .foregroundStyle(Color(hex: "081325"))
+                    Text(Texts.waterReminders)
+                        .body(size: 24, color: AppColors.textInverse)
                     Spacer()
                     Toggle(isOn: $waterReminderOn) {
-                        Text("Enable Feature")
+//                        Text("Enable Feature")
                     }
                     .labelsHidden()
-//                    .toggleStyle(SwitchToggleStyle(tint: Color(hex: "FF9500")))
                     .toggleStyle(WideToggleStyle())
                     .frame(width: 80, height: 40)
                 }
                 .padding(.horizontal, 30)
-                .frame(height: 80)
+                .frame(height: 80.deviceScaled())
                 Rectangle()
-                    .fill(Color(hex: "B8B8B8"))
+                    .fill(AppColors.backgroundSeparator)
                     .frame(height: 1)
                 Button {
                     
                 } label: {
-                    Text("Rate us on the App Store")
-                        .font(
-                            Font.custom("Lato-Regular", size: 24)
-                        )
-                        .foregroundStyle(Color(hex: "081325"))
+                    Text(Texts.share)
+                        .body(size: 24, color: AppColors.textInverse)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .padding(.horizontal, 30)
-                .frame(height: 80)
+                .frame(height: 80.deviceScaled())
                 Rectangle()
-                    .fill(Color(hex: "B8B8B8"))
+                    .fill(AppColors.backgroundSeparator)
                     .frame(height: 1)
                 Button {
                     
                 } label: {
-                    Text("Share with a friend")
-                        .font(
-                            Font.custom("Lato-Regular", size: 24)
-                        )
-                        .foregroundStyle(Color(hex: "081325"))
+                    Text(Texts.logout)
+                        .body(size: 24, color: AppColors.textInverse)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .padding(.horizontal, 30)
-                .frame(height: 80)
+                .frame(height: 80.deviceScaled())
                 Rectangle()
-                    .fill(Color(hex: "B8B8B8"))
+                    .fill(AppColors.backgroundSeparator)
                     .frame(height: 1)
                 Button {
                     showSettings = false
                 } label: {
-                    Text("CLOSE")
-                        .font(
-                            Font.custom("Lato-Black", size: 18)
-                        )
-                        .foregroundStyle(Color(hex: "F96758"))
+                    Text(Texts.close)
+                        .title2(size: 18, color: AppColors.textCritical)
                         .frame(maxWidth: .infinity, alignment: .center)
                 }
-                .frame(height: 80)
+                .frame(height: 80.deviceScaled())
             }
             .padding(.horizontal, 15)
             .padding(.top, 20)
@@ -168,31 +141,47 @@ struct SettingsView: View {
         }
     }
 
-    var combinedText: AttributedString {
-        var text1 = AttributedString("You have")
-        text1.font = .custom("Lato-Regular", size: 16)
-        text1.foregroundColor = .white
+    var combinedText: Text {
+        Text(Texts.subtitle1)
+            .body()
+        +
+        Text(Texts.subtitle2)
+            .title2(size: 16, color: AppColors.textCritical)
+        +
+        Text(Texts.subtitle3)
+            .body()
+    }
 
-        var text2 = AttributedString(" 1 day ")
-        text2.font = .custom("Lato-Regular", size: 16)
-        text2.foregroundColor = Color(hex: "F96758")
+    struct Images {
+        static let header = "SettingsHeader"
+        static let subscribe = "SettingsSubscribe"
+        static let next = "SettingsNext"
+    }
 
-        var text3 = AttributedString("left of your 3 day trial")
-        text3.font = .custom("Lato-Regular", size: 16)
-        text3.foregroundColor = .white
-        
-        return text1 + text2 + text3
+    struct Texts {
+        static let title = "Settings"
+        static let subtitle1 = "You have"
+        static let subtitle2 = " 1 day "
+        static let subtitle3 = "left of your 3 day trial"
+        static let subscribeTitle = "Subscribe Now"
+        static let subscribe1 = "$1.99 per month"
+        static let subscribe2 = "$19.99 per year"
+        static let whyFast = "Why Fast?"
+        static let waterReminders = "Water Reminders"
+        static let share = "Share with a friend"
+        static let logout = "Logout"
+        static let close = "CLOSE"
     }
 }
 
 struct WideToggleStyle: ToggleStyle {
     func makeBody(configuration: Configuration) -> some View {
         RoundedRectangle(cornerRadius: 20)
-            .fill(configuration.isOn ? Color(hex: "FF9500") : Color(hex: "e9e9eb"))
+            .fill(configuration.isOn ? AppColors.shapeActive : AppColors.shapeInactive)
             .frame(width: 83, height: 37)
             .overlay(
                 Circle()
-                    .fill(Color.white)
+                    .fill(AppColors.shapeMain)
                     .frame(width: 29, height: 29)
                     .offset(x: configuration.isOn ? 23 : -23)
                     .animation(.easeInOut(duration: 0.2), value: configuration.isOn)

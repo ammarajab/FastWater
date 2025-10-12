@@ -8,6 +8,7 @@
 import SwiftUI
 import Combine
 
+@MainActor
 final class CalendarViewModel: ObservableObject {
     private let fastingRecordManager: FastingRecordManager
     private let calendar = Calendar.current

@@ -8,6 +8,7 @@
 import SwiftUI
 import Combine
 
+@MainActor
 final class WaterViewModel: ObservableObject {
     private let waterManager: WaterManager
     private var cancellables = Set<AnyCancellable>()

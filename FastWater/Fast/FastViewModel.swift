@@ -8,6 +8,7 @@
 import SwiftUI
 import Combine
 
+@MainActor
 final class FastViewModel: ObservableObject {
     struct TimeParts { let days, hours, minutes, seconds: Int }
 

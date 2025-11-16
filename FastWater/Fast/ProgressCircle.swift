@@ -9,16 +9,23 @@ import SwiftUI
 
 struct ProgressCircle: View {
     @EnvironmentObject var fastViewModel: FastViewModel
-
+    @State private var animatedProgress: CGFloat = 0
     var sizeRatio: Double
 
     var body: some View {
         ZStack {
             Circle()
-                .trim(from: 0.0, to: min(fastViewModel.progress, 1.0))
+                .trim(from: 0.0, to: min(animatedProgress, 1.0))
                 .stroke(AppColors.shapeCritical, style: StrokeStyle(lineWidth: 3, lineCap: .round))
                 .rotationEffect(.degrees(-90))
-                .animation(.easeInOut(duration: 0.5), value: fastViewModel.progress)
+                .onAppear {
+                    withAnimation(.easeInOut(duration: 1.5)) {
+                        animatedProgress = fastViewModel.progress
+                    }
+                }
+                .onChange(of: fastViewModel.progress, { oldValue, newValue in
+                    animatedProgress = newValue
+                })
             VStack (spacing: 0){
                 Spacer()
                 Text(daysText())

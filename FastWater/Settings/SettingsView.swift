@@ -11,6 +11,16 @@ struct SettingsView: View {
     @Binding var showSettings: Bool
     @State private var waterReminderOn = false
     @State var showWhyFast = false
+    @StateObject var viewModel: SettingsViewModel
+
+//    private let waterManager: WaterManager
+//    var reminderStart: Date = Date()
+//    var reminderEnd: Date = Date()
+
+//    init(waterManager: WaterManager) {
+//        self.waterManager = waterManager
+//        waterRemindersEnabled = UserDefaults.standard.bool(forKey: "waterReminderEnabled")
+//    }
 
     var body: some View {
         ZStack( alignment: .top) {
@@ -86,9 +96,7 @@ struct SettingsView: View {
                     Text(Texts.waterReminders)
                         .body(size: 24, color: AppColors.textInverse)
                     Spacer()
-                    Toggle(isOn: $waterReminderOn) {
-//                        Text("Enable Feature")
-                    }
+                    Toggle("", isOn: $viewModel.waterRemindersEnabled)
                     .labelsHidden()
                     .toggleStyle(WideToggleStyle())
                     .frame(width: 80, height: 40)
@@ -137,8 +145,106 @@ struct SettingsView: View {
             if showWhyFast {
                 WhyFastView(showWhyFast: $showWhyFast)
             }
+            
+            if viewModel.showNotificationAlert {
+                ZStack {
+                    // Dimmed background
+                    Color.black.opacity(0.35)
+                        .ignoresSafeArea()
+
+                    // Alert card
+                    VStack(spacing: 20) {
+                        // Icon
+                        Image(systemName: "bell.badge.fill")
+                            .font(.system(size: 32, weight: .semibold))
+                            .foregroundColor(AppColors.textAccent)
+
+                        // Title
+                        Text("Enable Notifications")
+                            .font(.title3.weight(.semibold))
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(.primary)
+
+                        // Message
+                        Text("To receive reminders, please enable notifications in Settings.")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+
+                        // Buttons
+                        HStack(spacing: 12) {
+                            Button {
+                                withAnimation {
+                                    viewModel.showNotificationAlert = false
+                                }
+                            } label: {
+                                Text("Cancel")
+                                    .font(.body)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 10)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .stroke(Color.gray.opacity(0.4), lineWidth: 1)
+                                    )
+                                    .foregroundColor(.black)
+                            }
+
+                            Button {
+                                if let url = URL(string: UIApplication.openSettingsURLString) {
+                                    UIApplication.shared.open(url)
+                                }
+                                withAnimation {
+                                    viewModel.showNotificationAlert = false
+                                }
+                            } label: {
+                                Text("Open Settings")
+                                    .font(.body.weight(.semibold))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 10)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(Color.white.opacity(0.9))
+                                    )
+                                    .foregroundColor(.black) // 👈 stays black
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 22)
+                    .background(
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(Color(.systemBackground))
+                            .shadow(color: .black.opacity(0.2), radius: 20, x: 0, y: 10)
+                    )
+                    .padding(.horizontal, 32)
+                }
+                .transition(.scale.combined(with: .opacity))
+                .animation(.easeInOut(duration: 0.25), value: viewModel.showNotificationAlert)
+            }
 
         }
+        .onAppear {
+            viewModel.updateValues()
+        }
+//        .alert("Enable Notifications",
+//               isPresented: $viewModel.showNotificationAlert) {
+//            Button {
+//                if let url = URL(string: UIApplication.openSettingsURLString) {
+//                    UIApplication.shared.open(url)
+//                }
+//            } label: {
+//                Text("Open Settings")
+//                    .body(size: 24, color: AppColors.textInverse)
+//            }
+//            Button(role: .cancel) {
+//            } label: {
+//                Text("Cancel")
+//                    .body(size: 24, color: AppColors.textInverse)
+//            }
+//        } message: {
+//            Text("To receive reminders, please enable notifications in Settings.")
+//                .body(size: 24, color: AppColors.textInverse)
+//        }
     }
 
     var combinedText: Text {

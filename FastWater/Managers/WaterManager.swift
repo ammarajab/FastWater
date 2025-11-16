@@ -42,13 +42,17 @@ public final class WaterManager: ObservableObject {
         $reminderStart
             .receive(on: DispatchQueue.main)
             .sink { newValue in
-                try? repo.setReminderWindow(start: newValue, end: self.reminderEnd)
+                Task(priority: .userInitiated) {
+                    try? repo.setReminderWindow(start: newValue, end: self.reminderEnd)
+                }
             }
             .store(in: &cancellables)
         $reminderEnd
             .receive(on: DispatchQueue.main)
             .sink { newValue in
-                try? repo.setReminderWindow(start: self.reminderStart, end: newValue)
+                Task(priority: .userInitiated) {
+                    try? repo.setReminderWindow(start: self.reminderStart, end: newValue)
+                }
             }
             .store(in: &cancellables)
         resetCupsIfNewDay()
@@ -100,6 +104,15 @@ public final class WaterManager: ObservableObject {
         let comps = DateComponents(year: y, month: mo, day: d,
                                    hour: h, minute: m, second: s)
         return calendar.date(from: comps)
+    }
+
+    func enableWaterReminderNotifications() {
+//        Task(priority: .userInitiated) {
+//            try? repo.setReminderWindow(start: newValue, end: self.reminderEnd)
+//        }
+        try? repo.setReminderWindow(start: reminderStart, end: reminderEnd)
+        print("\(reminderStart.hour):\(reminderStart.minute)")
+        print("\(reminderEnd.hour):\(reminderEnd.minute)")
     }
 }
 

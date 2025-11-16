@@ -12,6 +12,7 @@
 		A02456A82E635669002E4805 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = A02456A72E635669002E4805 /* FirebaseCrashlytics */; };
 		A02456AA2E635669002E4805 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = A02456A92E635669002E4805 /* FirebaseFirestore */; };
 		A02456AC2E635669002E4805 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = A02456AB2E635669002E4805 /* FirebaseMessaging */; };
+		A07A45B02EC90EC0003FE0DD /* DotLottie in Frameworks */ = {isa = PBXBuildFile; productRef = A07A45AF2EC90EC0003FE0DD /* DotLottie */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -49,6 +50,7 @@
 				A02456AC2E635669002E4805 /* FirebaseMessaging in Frameworks */,
 				A02456A42E635669002E4805 /* FirebaseAnalytics in Frameworks */,
 				A02456A62E635669002E4805 /* FirebaseAuth in Frameworks */,
+				A07A45B02EC90EC0003FE0DD /* DotLottie in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,6 +98,7 @@
 				A02456A72E635669002E4805 /* FirebaseCrashlytics */,
 				A02456A92E635669002E4805 /* FirebaseFirestore */,
 				A02456AB2E635669002E4805 /* FirebaseMessaging */,
+				A07A45AF2EC90EC0003FE0DD /* DotLottie */,
 			);
 			productName = FastWater;
 			productReference = A08F8B9D2E3616B300A3B37D /* FastWater.app */;
@@ -127,6 +130,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				A02456A22E635669002E4805 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				A07A45AE2EC90EC0003FE0DD /* XCRemoteSwiftPackageReference "dotlottie-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A08F8B9E2E3616B300A3B37D /* Products */;
@@ -382,6 +386,14 @@
 				minimumVersion = 12.2.0;
 			};
 		};
+		A07A45AE2EC90EC0003FE0DD /* XCRemoteSwiftPackageReference "dotlottie-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/LottieFiles/dotlottie-ios";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -409,6 +421,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A02456A22E635669002E4805 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseMessaging;
+		};
+		A07A45AF2EC90EC0003FE0DD /* DotLottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A07A45AE2EC90EC0003FE0DD /* XCRemoteSwiftPackageReference "dotlottie-ios" */;
+			productName = DotLottie;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

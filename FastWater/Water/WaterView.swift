@@ -50,8 +50,9 @@ struct WaterView: View {
                 endTime: viewModel.endTimeText,
                 timeConnectText: Texts.footerSubtitle
             )
+            Spacer()
         }
-        .padding(.bottom, 10)
+        .padding(.bottom, 8)
     }
 
     struct Images {
@@ -102,6 +103,6 @@ struct TimeRangeView: View {
             }
             Spacer()
         }
-        .padding()
+//        .padding()
     }
 }

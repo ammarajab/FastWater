@@ -17,6 +17,15 @@ struct ScaleButtonStyle: ButtonStyle {
     }
 }
 
+struct TabBarButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .opacity(configuration.isPressed ? 0.85 : 1)
+            .animation(.spring(response: 0.2, dampingFraction: 0.5),
+                       value: configuration.isPressed)
+    }
+}
+
 extension AnyTransition {
     static var moveUp: AnyTransition {
         .asymmetric(

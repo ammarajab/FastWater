@@ -104,6 +104,7 @@ protocol FastingRepository {
 final class SwiftDataFastingRepository: FastingRepository {
     let context: ModelContext
     init(context: ModelContext) { self.context = context }
+    private let repo: FastingRepository = FirebaseFastingRepository()
 
     func getCurrentFast() throws -> CurrentFast {
         let fd = FetchDescriptor<CurrentFast>()
@@ -219,6 +220,23 @@ final class SwiftDataFastingRepository: FastingRepository {
         waterInfo.reminderStart = start
         waterInfo.reminderEnd = end
         try context.save()
+//        try await repo.setReminderWindow(start: start, end: end)
+        updateNotifications(start: start, end: end)
+    }
+
+    func updateNotifications(start: Date, end: Date) {
+        Task {
+            let granted = await NotificationManager.requestAuthorization()
+            guard granted else {
+                print("⚠️ Notifications not allowed by the user")
+                return
+            }
+
+            await NotificationManager.scheduleDailyReminders(
+                start: start,
+                end: end
+            )
+        }
     }
 
     func toggleCup(_ index: Int) throws {
@@ -238,5 +256,178 @@ final class SwiftDataFastingRepository: FastingRepository {
         let waterInfo = try getWaterInfo()
         waterInfo.lastOpenDate = Date()
         try context.save()
+    }
+}
+
+import FirebaseAuth
+import FirebaseFirestore
+
+final class FirebaseFastingRepository: FastingRepository {
+    func getCurrentFast() throws -> CurrentFast {
+        CurrentFast()
+    }
+
+    func getFastsContainer() throws -> FastsContainer {
+        FastsContainer()
+    }
+
+    func getWaterInfo() throws -> WaterInfo {
+        WaterInfo()
+    }
+
+    func startFast() throws {
+        
+    }
+
+    func endFast() throws {
+        
+    }
+
+    func deleteFast() throws {
+        
+    }
+
+    func setReminderWindow(start: Date, end: Date) throws {
+        guard let uid = Auth.auth().currentUser?.uid else { throw NSError(domain: "auth", code: 401) }
+        let start = minutesSinceMidnight(from: start)
+        let end   = minutesSinceMidnight(from: end)
+        let tzID = TimeZone.current.identifier
+
+        let data: [String: Any] = [
+            "startMinutes": start,
+            "endMinutes": end,
+            "tz": tzID,
+            "updatedAt": FieldValue.serverTimestamp()
+        ]
+
+        Task {
+            do {
+                try await Firestore.firestore()
+                    .collection("users").document(uid)
+                    .collection("settings").document("reminders")
+                    .setData(data, merge: true)
+                print("✅ Saved reminder prefs successfully")
+            } catch {
+                print("❌ Failed to save reminder prefs:", error.localizedDescription)
+            }
+        }
+    }
+
+    func toggleCup(_ index: Int) throws {
+        
+    }
+
+    func resetCupsToday() throws {
+        
+    }
+
+    func setLastOpenDate() throws {
+        
+    }
+
+//    func minutesSinceMidnight(hour: Int, minute: Int) -> Int {
+//        max(0, min(23 * 60 + 59, hour * 60 + minute))
+//    }
+
+    func timeComponents(from minutes: Int, timeZone: TimeZone) -> DateComponents {
+        let clamped = max(0, min(23*60+59, minutes))
+        return DateComponents(timeZone: timeZone, hour: clamped / 60, minute: clamped % 60)
+    }
+
+    func minutesSinceMidnight(from date: Date) -> Int {
+        let calendar = Calendar.current
+        let comps = calendar.dateComponents([.hour, .minute], from: date)
+        let hours = comps.hour ?? 0
+        let minutes = comps.minute ?? 0
+        return hours * 60 + minutes
+    }
+}
+
+import UserNotifications
+
+enum NotificationManager {
+    static func requestAuthorization() async -> Bool {
+        let center = UNUserNotificationCenter.current()
+        do {
+            let granted = try await center.requestAuthorization(
+                options: [.alert, .sound, .badge]
+            )
+            UserDefaults.standard.set(true, forKey: "waterReminderEnabled")
+            return granted
+        } catch {
+            print("❌ Notification auth error:", error.localizedDescription)
+            UserDefaults.standard.set(false, forKey: "waterReminderEnabled")
+            return false
+        }
+    }
+}
+
+extension NotificationManager {
+    static func scheduleDailyReminders(start: Date, end: Date, title: String = "Water reminder") async {
+        let center = UNUserNotificationCenter.current()
+        var ids: [String] = []
+        for index in 0 ..< 8 {
+            ids.append("reminder\(index + 1)")
+        }
+        center.removePendingNotificationRequests(withIdentifiers: ids)
+        let rawInterval = end.timeIntervalSince(start)
+        let totalInterval = rawInterval > 0 ? rawInterval : rawInterval + 86400
+        let step = totalInterval / 7
+        print("reminders totalInterval \(totalInterval)")
+        print("reminders step \(step)")
+        for index in 0 ..< 8 {
+            guard index < ids.count else { break }
+            let reminderId = ids[index]
+            let reminderTime = start.addingTimeInterval(step * Double(index))
+            let request = makeDailyRequest(
+                identifier: reminderId,
+                time: reminderTime,
+                title: title,
+                body: "It's time to have a glass of water."
+            )
+            do {
+                try await center.add(request)
+            } catch {
+                print("adding requests failed:", error)
+            }
+            print("reminder\(index + 1)")
+            print("reminders time \(reminderTime)")
+            print("reminders time \(reminderTime.hour):\(reminderTime.minute)")
+        }
+        print("✅ Scheduled start/end reminders at \(start.hour):\(start.minute) / \(end.hour):\(end.minute) minutes since midnight")
+    }
+
+    private static func makeDailyRequest(identifier: String,
+                                         time: Date,
+                                         title: String,
+                                         body: String) -> UNNotificationRequest {
+        var comps = DateComponents()
+        comps.hour = time.hour
+        comps.minute = time.minute
+
+        let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: true)
+
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        content.sound = .default
+        // Optional on iOS 15+: time-sensitive style if your app qualifies
+        // content.interruptionLevel = .timeSensitive
+
+        return UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+    }
+
+    @discardableResult
+    static func add(_ request: UNNotificationRequest) async -> Bool {
+        await withCheckedContinuation { cont in
+            UNUserNotificationCenter.current().add(request) { error in
+                if let error = error {
+                    print("❌ Scheduling error for \(request.identifier):", error.localizedDescription)
+                    cont.resume(returning: false)
+                } else {
+                    cont.resume(returning: true)
+                }
+            }
+        }
     }
 }

@@ -87,12 +87,13 @@ struct CalendarView: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.top, 8)
                 Text(Texts.footerSubtitle(hours: viewModel.hoursFasted, month: viewModel.selectedMonthText))
-                    .title2(color: AppColors.textAccent)
+                    .title2(size: 23, color: AppColors.textAccent)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity)
                     .padding(.top, 8)
                     .padding(.bottom, 20)
             }
+            Spacer()
         }
     }
 

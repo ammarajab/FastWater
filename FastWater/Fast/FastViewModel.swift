@@ -14,6 +14,8 @@ final class FastViewModel: ObservableObject {
 
     @Published private(set) var time: TimeParts = .init(days: 0, hours: 0, minutes: 0, seconds: 0)
     @Published private(set) var progress: Double = 0
+    @Published private(set) var playSuccessAnimation = false
+
     private let fastingManager: FastingManager
     private var cancellables = Set<AnyCancellable>()
     private var timer: Timer?
@@ -34,11 +36,21 @@ final class FastViewModel: ObservableObject {
     func saveFast()  {
         fastingManager.saveFast()
         recompute()
+        showSuccessAnimation()
     }
 
     func deleteFast(){
         fastingManager.deleteFast()
         recompute()
+    }
+
+    private func showSuccessAnimation() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.playSuccessAnimation = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                self.playSuccessAnimation = false
+            }
+        }
     }
 
     func onAppear() { startTimer() }

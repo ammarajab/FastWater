@@ -379,11 +379,12 @@ extension NotificationManager {
             guard index < ids.count else { break }
             let reminderId = ids[index]
             let reminderTime = start.addingTimeInterval(step * Double(index))
-            let request = makeDailyRequest(
+            let request = makeRequest(
                 identifier: reminderId,
                 time: reminderTime,
                 title: title,
-                body: "It's time to have a glass of water."
+                body: "It's time to have a glass of water.",
+                repeats: true
             )
             do {
                 try await center.add(request)
@@ -397,23 +398,44 @@ extension NotificationManager {
         print("✅ Scheduled start/end reminders at \(start.hour):\(start.minute) / \(end.hour):\(end.minute) minutes since midnight")
     }
 
-    private static func makeDailyRequest(identifier: String,
-                                         time: Date,
-                                         title: String,
-                                         body: String) -> UNNotificationRequest {
+    static func scheduleFastEndReminder(startTime: Date) async {
+        let title = "Fast Complete"
+        let center = UNUserNotificationCenter.current()
+        var reminderId = "fastComplete"
+        center.removePendingNotificationRequests(withIdentifiers: [reminderId])
+        let reminderTime = startTime.addingTimeInterval(57600)
+        let request = makeRequest(
+            identifier: reminderId,
+            time: reminderTime,
+            title: title,
+            body: "Congratulations you have fasted for 16 hours.",
+            repeats: false
+        )
+        do {
+            try await center.add(request)
+        } catch {
+            print("adding requests failed:", error)
+        }
+    }
+
+    static func removeFastEndreminder() {
+        let center = UNUserNotificationCenter.current()
+        center.removePendingNotificationRequests(withIdentifiers: ["fastComplete"])
+    }
+
+    private static func makeRequest(identifier: String,
+                                    time: Date,
+                                    title: String,
+                                    body: String,
+                                    repeats: Bool) -> UNNotificationRequest {
         var comps = DateComponents()
         comps.hour = time.hour
         comps.minute = time.minute
-
-        let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: true)
-
+        let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: repeats)
         let content = UNMutableNotificationContent()
         content.title = title
         content.body = body
         content.sound = .default
-        // Optional on iOS 15+: time-sensitive style if your app qualifies
-        // content.interruptionLevel = .timeSensitive
-
         return UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
     }
 

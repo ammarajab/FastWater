@@ -30,6 +30,19 @@ public final class FastingManager: ObservableObject {
         isFasting = true
         startTime = Date()
         try? repo.startFast()
+        updateNotifications(startTime: startTime)
+    }
+
+    private func updateNotifications(startTime: Date?) {
+        Task {
+            let granted = await NotificationManager.requestAuthorization()
+            guard granted,
+            let startTime else {
+                print("⚠️ Notifications not allowed by the user")
+                return
+            }
+            await NotificationManager.scheduleFastEndReminder(startTime: startTime)
+        }
     }
 
     public func saveFast() {
@@ -41,10 +54,23 @@ public final class FastingManager: ObservableObject {
             fastingRecordManager.addFast(Fast(startTime: startTime, endTime: endTime))
         }        
         try? repo.endFast()
+        removeNotifications()
     }
 
     public func deleteFast() {
         isFasting = false
         try? repo.deleteFast()
+        removeNotifications()
+    }
+
+    private func removeNotifications() {
+        Task {
+            let granted = await NotificationManager.requestAuthorization()
+            guard granted else {
+                print("⚠️ Notifications not allowed by the user")
+                return
+            }
+            NotificationManager.removeFastEndreminder()
+        }
     }
 }

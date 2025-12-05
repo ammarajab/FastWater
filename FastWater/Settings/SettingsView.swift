@@ -11,6 +11,7 @@ struct SettingsView: View {
     @Binding var showSettings: Bool
     @State private var waterReminderOn = false
     @State var showWhyFast = false
+    @State private var showLogoutConfirmation = false
     @StateObject var viewModel: SettingsViewModel
     @EnvironmentObject var authManager: AuthManager
 
@@ -120,7 +121,8 @@ struct SettingsView: View {
                     .fill(AppColors.backgroundSeparator)
                     .frame(height: 1)
                 Button {
-                    authManager.signOut()
+//                    authManager.signOut()
+                    showLogoutConfirmation = true
                 } label: {
                     Text(Texts.logout)
                         .body(size: 24, color: AppColors.textInverse)
@@ -146,7 +148,18 @@ struct SettingsView: View {
             if showWhyFast {
                 WhyFastView(showWhyFast: $showWhyFast)
             }
-            
+            if showLogoutConfirmation {
+                BlurBackgroundView()
+                    .onTapGesture {
+                        withAnimation {
+                            showLogoutConfirmation = false
+                        }
+                    }
+                LogoutConfirmationView(showLogoutConfirmation: $showLogoutConfirmation) {
+                    authManager.signOut()
+                    showSettings = false
+                }
+            }
             if viewModel.showNotificationAlert {
                 ZStack {
                     // Dimmed background
@@ -294,5 +307,69 @@ struct WideToggleStyle: ToggleStyle {
                     .animation(.easeInOut(duration: 0.2), value: configuration.isOn)
             )
             .onTapGesture { configuration.isOn.toggle() }
+    }
+}
+
+struct LogoutConfirmationView: View {
+    @Binding var showLogoutConfirmation: Bool
+    var onConfirm: () -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Button(action: {
+                withAnimation {
+                    showLogoutConfirmation = false
+                }
+            }) {
+                Image("FastPopupClose")
+            }
+            .frame(maxWidth: .infinity, alignment: .trailing)
+            .padding(.trailing, 12)
+            .padding(.bottom, 28)
+
+            VStack(spacing: 12) {
+                Text("Logout?")
+                    .title()
+                    .frame(maxWidth: .infinity, alignment: .center)
+                Text("Are you sure you want to logout?")
+                    .body(color: AppColors.textPrimary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 24)
+            }
+            .padding(.bottom, 32)
+
+            Button(action: {
+                withAnimation {
+                    onConfirm()
+                    showLogoutConfirmation = false
+                }
+            }) {
+                Text("Logout")
+                    .title()
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .frame(height: 120.deviceScaled())
+                    .background(AppColors.backgroundCritical)
+                    .clipShape(RoundedCorner(radius: 25, corners: [.topLeft, .topRight]))
+            }
+
+            Rectangle()
+                .fill(AppColors.shapePrimary)
+                .frame(height: 1)
+                .padding(.horizontal, 1)
+
+            Button(action: {
+                withAnimation {
+                    showLogoutConfirmation = false
+                }
+            }) {
+                Text("Cancel")
+                    .title()
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .frame(height: 120.deviceScaled())
+                    .background(AppColors.backgroundCritical)
+                    .clipShape(RoundedCorner(radius: 25, corners: [.bottomLeft, .bottomRight]))
+            }
+        }
+        .padding(.horizontal, 15)
     }
 }

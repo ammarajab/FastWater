@@ -59,7 +59,9 @@ final class FastViewModel: ObservableObject {
     private func startTimer() {
         stopTimer()
         timer = .scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-            self?.recompute()
+            Task { @MainActor in
+                self?.recompute()
+            }
         }
         timer?.tolerance = 0.2
     }

@@ -7,10 +7,13 @@
 
 import SwiftUI
 import DotLottie
+import FirebaseAuth
 
 struct FastView: View {
     @Binding var showFastPopup: Bool
+    @Binding var showLoginPopup: Bool
     @EnvironmentObject var fastViewModel: FastViewModel
+    @EnvironmentObject var authManager: AuthManager
 
     var body: some View {
         ZStack {
@@ -36,11 +39,7 @@ struct FastView: View {
                 }
                 Spacer()
                 Button {
-                    if fastViewModel.isFasting {
-                        showFastPopup = true
-                    } else {
-                        fastViewModel.startFasting()
-                    }
+                    handlePrimaryAction()
                 } label: {
                     Text( fastViewModel.isFasting ? Texts.buttonFasting : Texts.buttonNotFasting)
                         .title2()
@@ -58,6 +57,23 @@ struct FastView: View {
         }
         .onAppear { fastViewModel.onAppear() }
         .onDisappear { fastViewModel.onDisappear() }
+//        .sheet(isPresented: $showLoginSheet) {
+//            FastLoginSheet(isPresented: $showLoginSheet) {
+//                fastViewModel.startFasting()
+//            }
+//            .environmentObject(authManager)
+//        }
+    }
+
+    private func handlePrimaryAction() {
+        if fastViewModel.isFasting {
+            showFastPopup = true
+//        } else if authManager.user == nil || authManager.user?.isAnonymous == true {
+        } else if authManager.user == nil {
+            showLoginPopup = true
+        } else {
+            fastViewModel.startFasting()
+        }
     }
 
     struct Images {

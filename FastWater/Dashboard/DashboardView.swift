@@ -16,10 +16,12 @@ struct DashboardView: View {
     @State private var selectedTab: Tab = .fast
     @State private var showSettings = false
     @State private var showFastPopup = false
+    @State private var showLoginPopup = false
     @State private var showWaterReminderPicker = false
     @State private var waterReminderPickerType: WaterReminderPickerType?
     @EnvironmentObject private var fastingManager: FastingManager
     @EnvironmentObject private var fastingRecordManager: FastingRecordManager
+    @EnvironmentObject var authManager: AuthManager
     @Environment(\.modelContext) private var modelContext
     @StateObject private var fastViewModel: FastViewModel
     @StateObject private var calendarViewModel: CalendarViewModel
@@ -45,13 +47,15 @@ struct DashboardView: View {
                 Group {
                     switch selectedTab {
                     case .fast:
-                        FastView(showFastPopup: $showFastPopup)
+                        FastView(showFastPopup: $showFastPopup,
+                                 showLoginPopup: $showLoginPopup)
                             .environmentObject(fastViewModel)
                     case .calendar:
                         CalendarView()
                             .environmentObject(calendarViewModel)
                     case .water:
-                        WaterView(showWaterReminderPicker: $showWaterReminderPicker,
+                        WaterView(showLoginPopup: $showLoginPopup,
+                                  showWaterReminderPicker: $showWaterReminderPicker,
                                   waterReminderPickerType: $waterReminderPickerType,
                                   viewModel: waterViewModel)
                     }
@@ -72,8 +76,8 @@ struct DashboardView: View {
                 BlurBackgroundView()
 //                SettingsView(showSettings: $showSettings)
                 SettingsView(showSettings: $showSettings,
-                          viewModel: settingsViewModel)
-
+                             viewModel: settingsViewModel)
+//                .environmentObject(authManager)
             }
             if showFastPopup {
                 BlurBackgroundView()
@@ -82,6 +86,15 @@ struct DashboardView: View {
                     }
                 FastPopupView(showFastPopup: $showFastPopup)
                     .environmentObject(fastViewModel)
+            }
+            if showLoginPopup {
+                BlurBackgroundView()
+                    .onTapGesture {
+                        showLoginPopup = false
+                    }
+                FastLoginView(showLoginPopup: $showLoginPopup)
+                    .environmentObject(fastViewModel)
+//                    .environmentObject(authManager)
             }
             if showWaterReminderPicker,
                let waterReminderPickerType {
@@ -96,6 +109,7 @@ struct DashboardView: View {
         }
         .animation(.easeInOut, value: showSettings)
         .animation(.easeInOut, value: showFastPopup)
+        .animation(.easeInOut, value: showLoginPopup)
         .animation(.easeInOut, value: showWaterReminderPicker)
     }
 

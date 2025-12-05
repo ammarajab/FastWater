@@ -8,9 +8,12 @@
 import SwiftUI
 
 struct WaterView: View {
+    @Binding var showLoginPopup: Bool
     @Binding var showWaterReminderPicker: Bool
     @Binding var waterReminderPickerType: WaterReminderPickerType?
     @StateObject var viewModel: WaterViewModel
+    @EnvironmentObject var authManager: AuthManager
+
     private let columns = Array(repeating: GridItem(.fixed(125), spacing: 15), count: 2)
 
     var body: some View {
@@ -31,11 +34,7 @@ struct WaterView: View {
                         .clipped()
                         .transition(.moveUp)
                         .onTapGesture {
-                            let generator = UIImpactFeedbackGenerator(style: .heavy)
-                            generator.impactOccurred()
-                            withAnimation(.easeInOut(duration: 0.4)) {
-                                viewModel.toggleCup(index)
-                            }
+                            handleGlassTapped(index: index)
                         }
                 }
             }
@@ -44,6 +43,7 @@ struct WaterView: View {
                 .body()
                 .frame(maxWidth: .infinity, alignment: .center)
             TimeRangeView(
+                showLoginPopup: $showLoginPopup,
                 showWaterReminderPicker: $showWaterReminderPicker,
                 waterReminderPickerType: $waterReminderPickerType,
                 startTime: viewModel.startTimeText,
@@ -53,6 +53,18 @@ struct WaterView: View {
             Spacer()
         }
         .padding(.bottom, 8)
+    }
+
+    private func handleGlassTapped(index: Int) {
+        if authManager.user == nil {
+            showLoginPopup = true
+        } else {
+            let generator = UIImpactFeedbackGenerator(style: .heavy)
+            generator.impactOccurred()
+            withAnimation(.easeInOut(duration: 0.4)) {
+                viewModel.toggleCup(index)
+            }
+        }
     }
 
     struct Images {
@@ -74,8 +86,11 @@ struct WaterView: View {
 }
 
 struct TimeRangeView: View {
+    @Binding var showLoginPopup: Bool
     @Binding var showWaterReminderPicker: Bool
     @Binding var waterReminderPickerType: WaterReminderPickerType?
+    @EnvironmentObject var authManager: AuthManager
+
     var startTime: String
     var endTime: String
     let timeConnectText: String
@@ -84,8 +99,7 @@ struct TimeRangeView: View {
         HStack(spacing: 0) {
             Spacer()
             Button {
-                showWaterReminderPicker = true
-                waterReminderPickerType = .start
+                handleTimeTapped(pickerType: .start)
             } label: {
                 Text(startTime)
                     .title2(color: AppColors.textAccent)
@@ -94,8 +108,7 @@ struct TimeRangeView: View {
             Text(timeConnectText)
                 .body()
             Button {
-                showWaterReminderPicker = true
-                waterReminderPickerType = .end
+                handleTimeTapped(pickerType: .end)
             } label: {
                 Text(endTime)
                     .title2(color: AppColors.textAccent)
@@ -103,6 +116,15 @@ struct TimeRangeView: View {
             }
             Spacer()
         }
-//        .padding()
     }
+
+    private func handleTimeTapped(pickerType: WaterReminderPickerType) {
+        if authManager.user == nil {
+            showLoginPopup = true
+        } else {
+            showWaterReminderPicker = true
+            waterReminderPickerType = pickerType
+        }
+    }
+
 }

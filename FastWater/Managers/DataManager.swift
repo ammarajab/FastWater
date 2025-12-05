@@ -401,7 +401,7 @@ extension NotificationManager {
     static func scheduleFastEndReminder(startTime: Date) async {
         let title = "Fast Complete"
         let center = UNUserNotificationCenter.current()
-        var reminderId = "fastComplete"
+        let reminderId = "fastComplete"
         center.removePendingNotificationRequests(withIdentifiers: [reminderId])
         let reminderTime = startTime.addingTimeInterval(57600)
         let request = makeRequest(

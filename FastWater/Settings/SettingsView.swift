@@ -12,6 +12,7 @@ struct SettingsView: View {
     @State private var waterReminderOn = false
     @State var showWhyFast = false
     @StateObject var viewModel: SettingsViewModel
+    @EnvironmentObject var authManager: AuthManager
 
 //    private let waterManager: WaterManager
 //    var reminderStart: Date = Date()
@@ -119,7 +120,7 @@ struct SettingsView: View {
                     .fill(AppColors.backgroundSeparator)
                     .frame(height: 1)
                 Button {
-                    
+                    authManager.signOut()
                 } label: {
                     Text(Texts.logout)
                         .body(size: 24, color: AppColors.textInverse)

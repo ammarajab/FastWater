@@ -34,6 +34,7 @@ struct FastWaterApp: App {
         WindowGroup {
             coordinator.buildRootView()
                 .environmentObject(coordinator)
+                .environmentObject(coordinator.authManager)
                 .modelContainer(for: [CurrentFast.self, FastsContainer.self, WaterInfo.self])
                 .buttonStyle(ScaleButtonStyle())
         }
